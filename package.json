@@ -1,0 +1,15 @@
+{
+  "name": "home-new-tab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Firefox new tab: clock, bookmarks, weather, CBR rates, DTF, Steam wishlist deals",
+  "scripts": {
+    "dev": "web-ext run --source-dir . --ignore-files package.json package-lock.json README.md scripts updates.json",
+    "lint": "web-ext lint --source-dir . --ignore-files package.json package-lock.json README.md scripts updates.json",
+    "build": "web-ext build --source-dir . --ignore-files package.json package-lock.json README.md scripts updates.json --overwrite-dest",
+    "release": "powershell -ExecutionPolicy Bypass -File scripts/release.ps1"
+  },
+  "devDependencies": {
+    "web-ext": "^8.3.0"
+  }
+}

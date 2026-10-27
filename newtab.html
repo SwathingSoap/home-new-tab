@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Новая вкладка</title>
+  <link rel="icon" href="icons/icon.svg">
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <div class="bg" id="bg-a"></div>
+  <div class="bg" id="bg-b"></div>
+  <div class="scrim"></div>
+
+  <main class="page">
+    <header class="top">
+      <div class="top-left">
+        <section id="rates" class="rates"></section>
+        <div id="todo" class="todo"></div>
+      </div>
+      <div class="top-right">
+        <section id="weather" class="weather" tabindex="0"></section>
+        <div id="player" class="player"></div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="center">
+        <div id="clock" class="clock">&nbsp;</div>
+        <div class="subline"><span id="date"></span><span id="net" class="net"></span></div>
+        <button id="fact" class="fact" title="Следующая"></button>
+      </div>
+    </section>
+
+    <nav id="bookmarks" class="bookmarks"></nav>
+
+    <section class="panels">
+      <article id="news" class="panel"></article>
+      <article id="steam" class="panel"></article>
+    </section>
+  </main>
+
+  <footer id="caption" class="caption"></footer>
+
+  <script src="config.js"></script>
+  <script src="sources.js"></script>
+  <script src="newtab.js"></script>
+  <script src="spotify.js"></script>
+</body>
+</html>

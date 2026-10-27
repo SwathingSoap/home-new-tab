@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Дом — новая вкладка",
+  "version": "0.3.1",
+  "description": "Новая вкладка: часы, закладки, погода, курсы ЦБ, DTF, скидки Steam из вишлиста.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "home-new-tab@swathingsoap",
+      "strict_min_version": "128.0",
+      "update_url": "https://raw.githubusercontent.com/SwathingSoap/home-new-tab/main/updates.json",
+      "data_collection_permissions": { "required": ["none"] }
+    }
+  },
+  "icons": { "48": "icons/icon.svg", "96": "icons/icon.svg" },
+  "chrome_url_overrides": { "newtab": "newtab.html" },
+  "background": { "scripts": ["config.js", "sources.js", "background.js"] },
+  "permissions": ["storage", "unlimitedStorage", "alarms", "bookmarks", "identity"],
+  "host_permissions": [
+    "https://api.open-meteo.com/*",
+    "https://www.cbr.ru/*",
+    "https://api.dtf.ru/*",
+    "https://api.steampowered.com/*",
+    "https://store.steampowered.com/*",
+    "https://www.cheapshark.com/*",
+    "https://api.country.is/*",
+    "https://www.google.com/*",
+    "https://www.bing.com/*",
+    "https://esawebb.org/*",
+    "https://esahubble.org/*",
+    "https://www.gamerpower.com/*",
+    "https://services.swpc.noaa.gov/*",
+    "https://query.wikidata.org/*",
+    "https://accounts.spotify.com/*",
+    "https://api.spotify.com/*"
+  ]
+}
