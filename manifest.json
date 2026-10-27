@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Дом — новая вкладка",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "description": "Новая вкладка: часы, закладки, погода, курсы ЦБ, DTF, скидки Steam из вишлиста.",
   "browser_specific_settings": {
     "gecko": {
@@ -21,6 +21,7 @@
     "https://api.dtf.ru/*",
     "https://api.steampowered.com/*",
     "https://store.steampowered.com/*",
+    "https://steamcommunity.com/*",
     "https://www.cheapshark.com/*",
     "https://api.country.is/*",
     "https://www.google.com/*",

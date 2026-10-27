@@ -27,7 +27,7 @@ async function http(url, { type = 'json', timeout = 15_000, retry = true, ...ini
 const pad = (n) => String(n).padStart(2, '0');
 const chunked = (list, size) =>
   Array.from({ length: Math.ceil(list.length / size) }, (_, i) => list.slice(i * size, (i + 1) * size));
-const htmlText = (html) => new DOMParser().parseFromString(html, 'text/html').body.textContent.trim();
+const htmlText = (html) => new DOMParser().parseFromString(`<!doctype html><body>${html}`, 'text/html').body.textContent.trim();
 const cut = (text, max) => (text.length > max ? text.slice(0, max - 1).trimEnd() + '…' : text);
 
 /* ---------- Weather: Open-Meteo ---------- */
@@ -447,6 +447,38 @@ async function loadPlayers() {
   return { counts };
 }
 
+/* ---------- My Steam: recently played games from the public profile page (no API key) ---------- */
+
+async function loadMySteam() {
+  const html = await http(`https://steamcommunity.com/profiles/${CONFIG.steam.id}/?l=russian`, { type: 'text' });
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const text = (node) => node?.textContent.replace(/\s+/g, ' ').trim() ?? '';
+  const games = [...doc.querySelectorAll('.recent_game')].flatMap((game) => {
+    const link = game.querySelector('.game_name a');
+    const appId = Number(link?.getAttribute('href')?.match(/\/app\/(\d+)/)?.[1]);
+    if (!appId) return [];
+    // "463 ч. всего<br>последний запуск 26 окт." -> two lines
+    const details = [''];
+    for (const node of game.querySelector('.game_info_details')?.childNodes ?? []) {
+      if (node.nodeName === 'BR') details.push('');
+      else details[details.length - 1] += node.textContent;
+    }
+    const lines = details.map((line) => line.replace(/\s+/g, ' ').trim()).filter(Boolean);
+    return [{ appId, name: text(link), details: lines }];
+  });
+  const info = new Map(
+    (await steamItems(games.map((g) => g.appId), { language: 'russian', country_code: CONFIG.steam.country }, { include_assets: true }))
+      .map((i) => [i.appid, i]),
+  );
+  return {
+    games: games.map((g) => ({ ...g, image: info.has(g.appId) ? steamImage(info.get(g.appId)) : null })),
+    // "11,2 ч. за последние 2 нед."
+    recent: text(doc.querySelector('.recentgame_recentplaytime')),
+    // The game being played right now, when the profile shows one.
+    playing: text(doc.querySelector('.profile_in_game_name')) || null,
+  };
+}
+
 /* ---------- On this day: video games released on today's date (Wikidata) ---------- */
 
 const dayKey = (d = new Date()) => `${d.getMonth() + 1}-${d.getDate()}`;
@@ -488,5 +520,6 @@ const SOURCES = {
   giveaways: loadGiveaways,
   kp: loadKp,
   players: loadPlayers,
+  mysteam: loadMySteam,
   today: loadToday,
 };

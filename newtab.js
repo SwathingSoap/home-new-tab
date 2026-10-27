@@ -300,16 +300,18 @@ function renderNews() {
       el('a.brand', { href: 'https://dtf.ru/' }, 'DTF'),
       cats.map((c, j) => el(`button.tab${j === i ? '.on' : ''}`, { onclick: () => r.go(j) }, c.label)),
     ],
-    body: () => el('div.list.news-list', cat.items.map(newsItem)),
+    body: () => el('div.list.grid.news-grid', cat.items.map(newsItem)),
   })));
 }
 
 function newsItem(n) {
   return el('a.item.news-item', { href: n.link },
-    el('div.thumb', n.image && el('img', { src: n.image, alt: '', loading: 'lazy' })),
+    el('div.thumb',
+      n.image && el('img', { src: n.image, alt: '', loading: 'lazy' }),
+      n.summary && el('div.summary', n.summary),
+    ),
     el('div.text',
       el('div.title', n.title),
-      n.summary && el('div.summary', n.summary),
       el('div.meta', ago(n.date), n.comments > 0 && ` · 💬 ${n.comments}`),
     ),
   );
@@ -443,6 +445,14 @@ function steamEvent() {
   return parts.length ? el('span.events', { title: 'Даты Valve; список — config.js, steam.events' }, parts) : null;
 }
 
+function myGameCard(g, i) {
+  const playing = i === 0 && data.mysteam?.v?.playing === g.name;
+  return steamCard(g,
+    el('div.badges', playing ? el('span.new', 'ИГРАЮ СЕЙЧАС') : '', el('span', g.details[0] ?? '')),
+    g.details[1] ? el('div.badges', el('span.dim', g.details[1])) : '',
+  );
+}
+
 function renderSteam() {
   const s = data.steam?.v ?? { deals: [], fresh: [], upcoming: [] };
   const free = (data.giveaways?.v ?? []).filter((g) => !g.ends || g.ends > Date.now());
@@ -452,6 +462,7 @@ function renderSteam() {
     ['Скидки', s.deals, dealCard],
     ['Новинки', s.fresh, freshCard],
     ['Скоро выйдет', s.upcoming, upcomingCard],
+    ['Мои игры', data.mysteam?.v?.games ?? [], myGameCard],
     ['Бесплатно', free, giveawayCard],
   ].filter(([, items]) => items.length);
   steam.set(sections.map(([, items, card], i) => ({
@@ -464,7 +475,7 @@ function renderSteam() {
       ),
       steamEvent(),
     ],
-    body: () => el('div.list.grid', items.map(card)),
+    body: () => el('div.list.grid', items.map((item, n) => card(item, n))),
   })));
 }
 
@@ -675,6 +686,7 @@ const RENDER = {
   giveaways: renderSteam,
   kp: renderWeather,
   players: renderSteam,
+  mysteam: renderSteam,
   today: renderFact,
 };
 

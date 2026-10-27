@@ -67,5 +67,5 @@ const CONFIG = {
   },
 
   // Minutes between refreshes of each source (done in the background, tabs open from cache).
-  refreshMin: { weather: 30, rates: 180, dtf: 15, steam: 180, net: 5, wallpapers: 720, giveaways: 180, kp: 180, players: 30, today: 720 },
+  refreshMin: { weather: 30, rates: 180, dtf: 15, steam: 180, net: 5, wallpapers: 720, giveaways: 180, kp: 180, players: 30, today: 720, mysteam: 30 },
 };
