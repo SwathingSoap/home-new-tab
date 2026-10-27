@@ -3,6 +3,11 @@
                    "home-new-tab@swathingsoap":  {
                                                      "updates":  [
                                                                      {
+                                                                         "version":  "0.3.5",
+                                                                         "update_link":  "https://github.com/SwathingSoap/home-new-tab/releases/download/v0.3.5/home-new-tab-0.3.5.xpi",
+                                                                         "update_hash":  "sha256:ee1e63a54aff9269535f58d54b5a840fe3501bbe0eab71a8e15e4644b106a7d6"
+                                                                     },
+                                                                     {
                                                                          "version":  "0.3.4",
                                                                          "update_link":  "https://github.com/SwathingSoap/home-new-tab/releases/download/v0.3.4/home-new-tab-0.3.4.xpi",
                                                                          "update_hash":  "sha256:b9241b2ab4272c281180b4f0a06f0f7654f203fa896fd8ae766b0294be776790"

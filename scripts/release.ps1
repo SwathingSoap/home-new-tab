@@ -37,7 +37,7 @@ Write-Host "version $old -> $new"
 
 Remove-Item (Join-Path $root '.amo-upload-uuid') -ErrorAction SilentlyContinue
 npx web-ext sign --source-dir . --channel unlisted --approval-timeout 1800000 `
-    --ignore-files package.json package-lock.json README.md scripts updates.json
+    --ignore-files package.json package-lock.json README.md scripts updates.json docs
 if ($LASTEXITCODE -ne 0) { throw "web-ext sign failed ($LASTEXITCODE)" }
 
 $signed = Get-ChildItem (Join-Path $root 'web-ext-artifacts') -Filter "*-$new.xpi" | Select-Object -First 1

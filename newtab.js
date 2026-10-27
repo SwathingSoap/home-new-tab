@@ -506,17 +506,20 @@ function renderFact() {
   show();
 }
 
-/* ---------- To-do: a chip with the next item, the list opens on click; kept in storage.sync ---------- */
+/* ---------- To-do: a card under the rates, kept in storage.sync (Firefox Sync carries it) ---------- */
 
 let todos = [];
-const todoChip = el('button.todo-chip', { title: 'Дела', onclick: () => toggleTodo() });
+let showDone = false;
+const todoHead = el('div.todo-head');
+const todoBar = el('i');
 const todoList = el('ul.todo-list');
+const todoFoot = el('div.todo-foot');
 const todoInput = el('input', {
-  placeholder: 'Добавить дело и Enter',
+  placeholder: '＋ Новое дело…',
   maxlength: 200,
   onkeydown(e) {
     const text = this.value.trim();
-    if (e.key === 'Escape') return toggleTodo(false);
+    if (e.key === 'Escape') return this.blur();
     if (e.key !== 'Enter' || !text) return;
     todos.push({ id: Date.now().toString(36), text, done: false });
     this.value = '';
@@ -524,57 +527,88 @@ const todoInput = el('input', {
   },
 });
 
-function toggleTodo(open = !$('todo').classList.contains('open')) {
-  $('todo').classList.toggle('open', open);
-  if (open) todoInput.focus();
-}
-
 function saveTodos() {
   renderTodo();
   ext.storage.sync.set({ todos }).catch((e) => console.warn('todos', e));
 }
 
-function renderTodo() {
-  const left = todos.filter((t) => !t.done);
-  const done = todos.length - left.length;
-  todoChip.replaceChildren(
-    ...(left.length
-      ? [el('span.box'), el('span.todo-text', left[0].text), left.length > 1 ? el('span.more', `+${left.length - 1}`) : '']
-      : [el('span.dim', '＋ Дела')]),
-  );
-  todoList.replaceChildren(
-    ...[...left, ...todos.filter((t) => t.done)].map((t) =>
-      el(`li${t.done ? '.done' : ''}`,
-        el('button.check', {
-          title: t.done ? 'Вернуть' : 'Готово',
-          onclick() {
-            t.done = !t.done;
-            saveTodos();
-          },
-        }, t.done ? '✓' : ''),
-        el('span.todo-text', t.text),
-        el('button.remove', {
-          title: 'Удалить',
-          onclick() {
-            todos = todos.filter((x) => x !== t);
-            saveTodos();
-          },
-        }, '×'),
-      ),
-    ),
-    ...(done > 1 ? [el('li.clear', el('button', {
+function todoItem(t) {
+  const text = el('span.todo-text', { title: 'Двойной клик — изменить' }, t.text);
+  text.addEventListener('dblclick', () => {
+    const edit = el('input.todo-edit', { value: t.text, maxlength: 200 });
+    let finished = false;
+    const finish = (save) => {
+      if (finished) return;
+      finished = true;
+      const value = edit.value.trim();
+      if (save && value) t.text = value;
+      saveTodos();
+    };
+    edit.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') finish(true);
+      if (e.key === 'Escape') finish(false);
+    });
+    edit.addEventListener('blur', () => finish(true));
+    text.replaceWith(edit);
+    edit.focus();
+    edit.select();
+  });
+  const li = el(`li${t.done ? '.done' : ''}`,
+    el('button.check', {
+      title: t.done ? 'Вернуть' : 'Готово',
       onclick() {
-        todos = todos.filter((t) => !t.done);
+        t.done = !t.done;
+        t.doneAt = t.done ? Date.now() : undefined;
+        if (!t.done) return saveTodos();
+        // Strike through first, then let it slide into "done".
+        li.classList.add('done', 'leaving');
+        setTimeout(saveTodos, 700);
+      },
+    }, '✓'),
+    text,
+    el('button.remove', {
+      title: 'Удалить',
+      onclick() {
+        todos = todos.filter((x) => x !== t);
         saveTodos();
       },
-    }, `Убрать выполненные (${done})`))] : []),
+    }, '×'),
+  );
+  return li;
+}
+
+function renderTodo() {
+  const left = todos.filter((t) => !t.done);
+  const done = todos.filter((t) => t.done).sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0));
+  $('todo').classList.toggle('empty', !todos.length);
+  todoHead.replaceChildren(
+    el('span', 'Дела'),
+    todos.length ? el('span.dim', left.length ? `${done.length} из ${todos.length}` : 'всё сделано 🎉') : '',
+  );
+  todoBar.style.width = todos.length ? `${(done.length / todos.length) * 100}%` : '0';
+  todoList.replaceChildren(...left.map(todoItem), ...(showDone ? done.map(todoItem) : []));
+  todoFoot.replaceChildren(
+    ...(done.length
+      ? [
+          el('button', {
+            onclick() {
+              showDone = !showDone;
+              renderTodo();
+            },
+          }, `${showDone ? '▾' : '▸'} ✓ ${done.length} выполнено`),
+          el('button', {
+            onclick() {
+              todos = left;
+              showDone = false;
+              saveTodos();
+            },
+          }, 'очистить'),
+        ]
+      : []),
   );
 }
 
-$('todo').append(todoChip, el('div.todo-pop', todoInput, todoList));
-document.addEventListener('pointerdown', (e) => {
-  if (!$('todo').contains(e.target)) toggleTodo(false);
-});
+$('todo').append(todoHead, el('div.todo-progress', todoBar), todoList, todoInput, todoFoot);
 ext.storage.sync.get('todos').then((r) => {
   todos = r.todos ?? [];
   renderTodo();
