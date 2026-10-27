@@ -1,7 +1,13 @@
 {
-  "addons": {
-    "home-new-tab@swathingsoap": {
-      "updates": []
-    }
-  }
+    "addons":  {
+                   "home-new-tab@swathingsoap":  {
+                                                     "updates":  [
+                                                                     {
+                                                                         "version":  "0.3.2",
+                                                                         "update_link":  "https://github.com/SwathingSoap/home-new-tab/releases/download/v0.3.2/home-new-tab-0.3.2.xpi",
+                                                                         "update_hash":  "sha256:3178c6b621f10a3db1ca47cbcd416ab6ba2aa49cecf32cf5b2750a57f77def63"
+                                                                     }
+                                                                 ]
+                                                 }
+               }
 }
